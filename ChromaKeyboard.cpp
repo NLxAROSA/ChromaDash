@@ -45,9 +45,7 @@ QUERYDEVICE QueryDevice = NULL;
 HMODULE m_ChromaSDKModule;
 
 ChromaKeyboard::ChromaKeyboard()	{
-	if (setup())	{
-		printf("INFO: Successfully initialized Chroma SDK library\n");
-	}else{
+	if (!setup())	{
 		printf("ERROR: Unable to initialize Chroma SDK library: is the latest Synapse installed?\n");
 	}
 }
@@ -135,8 +133,40 @@ void renderRpm(float rpm, float maxRpm, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE*
 
 void renderGear(int gear, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect)	{
 	// Only display gears 1 through 9
-	if (gear > 0 && gear < 10) {
-		Effect->Color[1][1 + gear] = YELLOW;
+	if (gear >= -1 && gear < 10) {
+
+		switch (gear) {
+		case -1: // Reverse
+			Effect->Color[HIBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD_SUBTRACT)][LOBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD_SUBTRACT)] = YELLOW;
+			break;
+		case 1: // First gear
+			Effect->Color[HIBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD1)][LOBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD1)] = YELLOW;
+			break;
+		case 2: // Second gear
+			Effect->Color[HIBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD2)][LOBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD2)] = YELLOW;
+			break;
+		case 3: // Third gear
+			Effect->Color[HIBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD3)][LOBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD3)] = YELLOW;
+			break;
+		case 4: // Fourth gear
+			Effect->Color[HIBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD4)][LOBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD4)] = YELLOW;
+			break;
+		case 5: // Fifth gear
+			Effect->Color[HIBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD5)][LOBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD5)] = YELLOW;
+			break;
+		case 6: // Sixth gear
+			Effect->Color[HIBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD6)][LOBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD6)] = YELLOW;
+			break;
+		case 7: // Seventh gear
+			Effect->Color[HIBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD7)][LOBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD7)] = YELLOW;
+			break;
+		case 8: // Eighth gear
+			Effect->Color[HIBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD8)][LOBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD8)] = YELLOW;
+			break;
+		case 9: // Ninth gear
+			Effect->Color[HIBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD9)][LOBYTE(ChromaSDK::Keyboard::RZKEY_NUMPAD9)] = YELLOW;
+			break;
+		}
 	}
 
 }

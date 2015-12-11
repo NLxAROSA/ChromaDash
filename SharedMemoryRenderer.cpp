@@ -22,7 +22,7 @@ limitations under the License.
 
 #define MAP_OBJECT_NAME "$pcars$"
 
-ChromaKeyboard* chromaKeyboard;
+ChromaKeyboard chromaKeyboard;
 bool loggingEnabled = false;
 
 void SharedMemoryRenderer::enableLogging()	{
@@ -33,12 +33,10 @@ void SharedMemoryRenderer::disableLogging() {
 	loggingEnabled = false;
 }
 
-SharedMemoryRenderer::SharedMemoryRenderer()	{
-	chromaKeyboard = new ChromaKeyboard();
+SharedMemoryRenderer::SharedMemoryRenderer() {
 }
 
 SharedMemoryRenderer::~SharedMemoryRenderer()	{
-	delete chromaKeyboard;
 }
 
 void logMessage(const char* message)	{
@@ -56,7 +54,7 @@ void processSharedMemoryData(const SharedMemory* sharedData) {
 		logMessage("ERROR: Data version mismatch, please make sure that your pCARS version matches your ChromaDash version\n");
 	}else {
 		// Got valid data, display this on the Chroma keyboard
-		chromaKeyboard->display(sharedData->mRpm, sharedData->mMaxRPM, sharedData->mGear);
+		chromaKeyboard.display(sharedData->mRpm, sharedData->mMaxRPM, sharedData->mGear);
 	}
 }
 

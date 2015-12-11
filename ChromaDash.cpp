@@ -26,29 +26,25 @@ limitations under the License.
 #define POLL_TIME_IN_MILLIS 17L
 #define ESC_KEY 27
 
-SharedMemoryRenderer* createSharedMemoryRenderer()	{
+SharedMemoryRenderer sharedMemoryRenderer;
 
-	SharedMemoryRenderer sharedMemoryRenderer = SharedMemoryRenderer();
+void createSharedMemoryRenderer()	{
 	// Process shared memory and log any errors
 	sharedMemoryRenderer.enableLogging();
 	sharedMemoryRenderer.process();
-
-	return &sharedMemoryRenderer;
 }
 
 int main()	{
-
 	printf("# CHROMADASH - PROJECT CARS RAZER CHROMA DASHBOARD %s\n", CHROMADASH_VERSION);
 	printf("# (c) 2015 Lars Rosenquist\n\n");
 	printf("# Press ESC to terminate\n\n");
-
-	SharedMemoryRenderer *sharedMemoryRenderer = createSharedMemoryRenderer();
+	createSharedMemoryRenderer();
     
 	// Keep polling until ESC is hit
 	while (true)	{
 		// Process shared memory, but don't log any errors at ~59FPS ;)
-		sharedMemoryRenderer->disableLogging();
-		sharedMemoryRenderer->process();
+		sharedMemoryRenderer.disableLogging();
+		sharedMemoryRenderer.process();
 
 		// Check on exit criteria
 		if (_kbhit() && _getch() == ESC_KEY)	{
