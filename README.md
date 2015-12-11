@@ -32,3 +32,17 @@ If all went well, you should now be up and running and RPMs and gears displaying
 
 * See http://www.projectcarsgame.com for more info on Project CARS.
 * See http://developer.razerzone.com/chroma/ for more info on Razer Chroma SDK.
+
+# Troubleshooting:
+
+Q: App throws an error about not being able to initialize the Chroma SDK.
+A: Install Razer Synapse, or get the Chroma SDK.
+
+Q: App throws an error about not being able to connect to Project CARS.
+A: Make sure Project CARS is started and Shared Memory is enabled.
+
+Q: App doesn't throw any errors, but my keyboard does nothing.
+A: Enable Chroma Apps in Synapse by selecting your device and going into the 'Chroma Apps' tab.
+
+Q: I found an issue or have a feature request.
+A: Please register your issue or request here: https://github.com/NLxAROSA/ChromaDash/issues
