@@ -4,6 +4,8 @@
 
 This project connects Project CARS to your Razer Chroma keyboard to show various information. It's a windows native command line application (written in C++ and a bit of plain old C) that will connect to Project CARS via Shared Memory and to your Razer Chroma keyboard via the Chroma SDK. At the moment this is limited to using the F-key row as an RPM meter and the numerical row for showing gears. Expect much more in the future!
 
+* See https://www.youtube.com/watch?v=AReeik9pvEc for an example video.
+
 # Building and running from source
 
 1. Get Razer Synapse from here: http://www.razerzone.com/synapse/ (Synapse includes the Chroma SDK along with it)
