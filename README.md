@@ -2,12 +2,7 @@
 
 # Introducing ChromaDash for Project CARS #
 
-This project connects Project CARS to your Razer Chroma keyboard to show various information. At the moment this is limited to using the F-key row as an RPM meter and the numerical row for showing gears. Expect much more in the future!
-
-It's a windows native command line application (written in C++ and a bit of plain old C) that will connect to Project CARS via Shared Memory and to your Razer Chroma keyboard via the Chroma SDK.
-
-* See http://www.projectcarsgame.com for more info on Project CARS.
-* Latest binary download is always available at <coming soon>
+This project connects Project CARS to your Razer Chroma keyboard to show various information. It's a windows native command line application (written in C++ and a bit of plain old C) that will connect to Project CARS via Shared Memory and to your Razer Chroma keyboard via the Chroma SDK. At the moment this is limited to using the F-key row as an RPM meter and the numerical row for showing gears. Expect much more in the future!
 
 # Building from source
 
@@ -35,3 +30,8 @@ It's a windows native command line application (written in C++ and a bit of plai
 2. Select your device in Synapse, go to the 'Chroma apps' tab and enable Chroma Apps.
 
 If all went well, you should now be up and running!
+
+# Additional information
+
+* See http://www.projectcarsgame.com for more info on Project CARS.
+* See http://developer.razerzone.com/chroma/ for more info on Razer Chroma SDK.
