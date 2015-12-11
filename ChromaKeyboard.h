@@ -38,11 +38,11 @@ const COLORREF GREY = RGB(125, 125, 125);
 #define HEADSET_DEVICES     4
 #define KEYPAD_DEVICES      5
 
-class ChromaKeyboardRenderer	{
+class ChromaKeyboard	{
 public:
-	ChromaKeyboardRenderer();
-	~ChromaKeyboardRenderer();
-	BOOL Initialize();
-	BOOL UnInitialize();
-	void render(float rpm, float maxRpm, int gear);
+	ChromaKeyboard();
+	~ChromaKeyboard();
+	BOOL setup();
+	BOOL teardown();
+	void display(float rpm, float maxRpm, int gear);
 };

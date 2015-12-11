@@ -18,11 +18,11 @@ limitations under the License.
 #include "SharedMemoryRenderer.h"
 #include "SharedMemory.h"
 #include <cstdio>
-#include "ChromaKeyboardRenderer.h"
+#include "ChromaKeyboard.h"
 
 #define MAP_OBJECT_NAME "$pcars$"
 
-ChromaKeyboardRenderer* renderer;
+ChromaKeyboard* chromaKeyboard;
 bool loggingEnabled = false;
 
 void SharedMemoryRenderer::enableLogging()	{
@@ -34,11 +34,11 @@ void SharedMemoryRenderer::disableLogging() {
 }
 
 SharedMemoryRenderer::SharedMemoryRenderer()	{
-	renderer = new ChromaKeyboardRenderer();
+	chromaKeyboard = new ChromaKeyboard();
 }
 
 SharedMemoryRenderer::~SharedMemoryRenderer()	{
-	delete renderer;
+	delete chromaKeyboard;
 }
 
 void logMessage(const char* message)	{
@@ -55,8 +55,8 @@ void processSharedMemoryData(const SharedMemory* sharedData) {
 		// Version conflict, log an error
 		logMessage("ERROR: Data version mismatch, please make sure that your pCARS version matches your ChromaDash version\n");
 	}else {
-		// Got valid data, do some processing
-		renderer->render(sharedData->mRpm, sharedData->mMaxRPM, sharedData->mGear);
+		// Got valid data, display this on the Chroma keyboard
+		chromaKeyboard->display(sharedData->mRpm, sharedData->mMaxRPM, sharedData->mGear);
 	}
 }
 

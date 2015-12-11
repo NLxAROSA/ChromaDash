@@ -17,7 +17,7 @@ limitations under the License.
 */
 #pragma once
 #include "stdafx.h"
-#include "ChromaKeyboardRenderer.h"
+#include "ChromaKeyboard.h"
 
 #ifdef _WIN64
 #define CHROMASDKDLL        _T("RzChromaSDK64.dll")
@@ -44,19 +44,19 @@ DELETEEFFECT DeleteEffect = NULL;
 QUERYDEVICE QueryDevice = NULL;
 HMODULE m_ChromaSDKModule;
 
-ChromaKeyboardRenderer::ChromaKeyboardRenderer()	{
-	if (Initialize())	{
+ChromaKeyboard::ChromaKeyboard()	{
+	if (setup())	{
 		printf("INFO: Successfully initialized Chroma SDK library\n");
 	}else{
 		printf("ERROR: Unable to initialize Chroma SDK library: is the latest Synapse installed?\n");
 	}
 }
 
-ChromaKeyboardRenderer::~ChromaKeyboardRenderer()	{
-	UnInitialize();
+ChromaKeyboard::~ChromaKeyboard()	{
+	teardown();
 }
 
-BOOL ChromaKeyboardRenderer::Initialize()	{
+BOOL ChromaKeyboard::setup()	{
 	
 	if (m_ChromaSDKModule == NULL)	{
 		m_ChromaSDKModule = LoadLibrary(CHROMASDKDLL);
@@ -94,7 +94,7 @@ BOOL ChromaKeyboardRenderer::Initialize()	{
 	return TRUE;
 }
 
-BOOL ChromaKeyboardRenderer::UnInitialize()	{
+BOOL ChromaKeyboard::teardown()	{
 
 	if (m_ChromaSDKModule != NULL)	{
 		RZRESULT Result = RZRESULT_INVALID;
@@ -134,14 +134,14 @@ void renderRpm(float rpm, float maxRpm, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE*
 }
 
 void renderGear(int gear, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect)	{
-	// Only render gears 1 through 9
+	// Only display gears 1 through 9
 	if (gear > 0 && gear < 10) {
 		Effect->Color[1][1 + gear] = YELLOW;
 	}
 
 }
 
-void ChromaKeyboardRenderer::render(float rpm, float maxRpm, int gear)	{
+void ChromaKeyboard::display(float rpm, float maxRpm, int gear)	{
 
 	if (CreateKeyboardEffect) {
 

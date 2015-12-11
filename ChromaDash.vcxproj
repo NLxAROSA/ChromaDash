@@ -86,13 +86,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ChromaKeyboardRenderer.cpp" />
+    <ClCompile Include="ChromaKeyboard.cpp" />
     <ClCompile Include="ChromaDash.cpp" />
     <ClCompile Include="SharedMemoryRenderer.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ChromaKeyboardRenderer.h" />
+    <ClInclude Include="ChromaKeyboard.h" />
     <ClInclude Include="SharedMemoryRenderer.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
