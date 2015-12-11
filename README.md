@@ -16,8 +16,7 @@ This project connects Project CARS to your Razer Chroma keyboard to show various
 
 1. Start the application by double-clicking it.
 2. Windows will complain about security (coming from an unknown/unverified source) both when downloading and starting the application. Please allow/unblock the application in order to allow it to start. Windows Firewall will also ask for permission to access the local network. Please allow it access for proper functioning.
-3. If Windows complains about missing DLLs (e.g. MSVCR120.DLL or similar), please download and install the Visual C++ Redistributable Packages for Visual Studio 2013 from http://www.microsoft.com/en-us/download/details.aspx?id=40784 (vcredist_x86.exe), then start again.
-4. Console will show a notification about the application being started and connected (or not) and will log various messages during operation.
+3. Console will show a notification about the application being started and connected (or not) and will log various messages during operation.
 
 # Connecting to Project CARS
 
