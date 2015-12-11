@@ -19,29 +19,36 @@ limitations under the License.
 #include <conio.h>
 #include <chrono>
 #include <thread>
-#include "SharedMemoryProcessor.h"
+#include "SharedMemoryRenderer.h"
 
 // Configuration properties
 #define CHROMADASH_VERSION "v0.1.0"
 #define POLL_TIME_IN_MILLIS 17L
 #define ESC_KEY 27
 
+SharedMemoryRenderer* createSharedMemoryRenderer()	{
+
+	SharedMemoryRenderer sharedMemoryRenderer = SharedMemoryRenderer();
+	// Process shared memory and log any errors
+	sharedMemoryRenderer.enableLogging();
+	sharedMemoryRenderer.process();
+
+	return &sharedMemoryRenderer;
+}
+
 int main()	{
 
-	// Print some information on the console
 	printf("# CHROMADASH - PROJECT CARS RAZER CHROMA DASHBOARD %s\n", CHROMADASH_VERSION);
 	printf("# (c) 2015 Lars Rosenquist\n\n");
 	printf("# Press ESC to terminate\n\n");
 
-	SharedMemoryProcessor sharedMemoryProcessor = SharedMemoryProcessor();
+	SharedMemoryRenderer *sharedMemoryRenderer = createSharedMemoryRenderer();
     
-	// Process shared memory, print any errors
-	sharedMemoryProcessor.process(true);
-
 	// Keep polling until ESC is hit
 	while (true)	{
-		// Process shared memory, don't print any errors at ~59FPS ;)
-		sharedMemoryProcessor.process(false);
+		// Process shared memory, but don't log any errors at ~59FPS ;)
+		sharedMemoryRenderer->disableLogging();
+		sharedMemoryRenderer->process();
 
 		// Check on exit criteria
 		if (_kbhit() && _getch() == ESC_KEY)	{

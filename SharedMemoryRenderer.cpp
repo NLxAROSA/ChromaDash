@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-#include "SharedMemoryProcessor.h"
+#include "SharedMemoryRenderer.h"
 #include "SharedMemory.h"
 #include <cstdio>
 #include "ChromaKeyboardRenderer.h"
@@ -23,28 +23,37 @@ limitations under the License.
 #define MAP_OBJECT_NAME "$pcars$"
 
 ChromaKeyboardRenderer* renderer;
+bool loggingEnabled = false;
 
-SharedMemoryProcessor::SharedMemoryProcessor()	{
+void SharedMemoryRenderer::enableLogging()	{
+	loggingEnabled = true;
+}
+
+void SharedMemoryRenderer::disableLogging() {
+	loggingEnabled = false;
+}
+
+SharedMemoryRenderer::SharedMemoryRenderer()	{
 	renderer = new ChromaKeyboardRenderer();
 }
 
-SharedMemoryProcessor::~SharedMemoryProcessor()	{
+SharedMemoryRenderer::~SharedMemoryRenderer()	{
 	delete renderer;
 }
 
-void logMessage(bool shouldLog, const char* message)	{
-	if (shouldLog){
+void logMessage(const char* message)	{
+	if (loggingEnabled){
 		printf(message);
 	}
 }
 
 // Processes the shared memory
-void processSharedMemoryData(const SharedMemory* sharedData, bool shouldLog) {
+void processSharedMemoryData(const SharedMemory* sharedData) {
 	// Ensure we're sync'd to the correct data version
 	if (sharedData->mVersion != SHARED_MEMORY_VERSION)
 	{
 		// Version conflict, log an error
-		logMessage(shouldLog, "ERROR: Data version mismatch, please make sure that your pCARS version matches your ChromaDash version\n");
+		logMessage("ERROR: Data version mismatch, please make sure that your pCARS version matches your ChromaDash version\n");
 	}else {
 		// Got valid data, do some processing
 		renderer->render(sharedData->mRpm, sharedData->mMaxRPM, sharedData->mGear);
@@ -52,33 +61,33 @@ void processSharedMemoryData(const SharedMemory* sharedData, bool shouldLog) {
 }
 
 // Processes the memory mapped file
-void processFile(HANDLE fileHandle, bool shouldLog) {
+void processFile(HANDLE fileHandle) {
 
 	const SharedMemory* sharedData = (SharedMemory*)MapViewOfFile(fileHandle, PAGE_READONLY, 0, 0, sizeof(SharedMemory));
 
 	if (sharedData == NULL) {
 		// File found, but could not be mapped to shared memory data
-		logMessage(shouldLog, "ERROR: No data available to process\n");
+		logMessage("ERROR: No data available to process\n");
 	}else {
 		// Process file
-		processSharedMemoryData(sharedData, shouldLog);
+		processSharedMemoryData(sharedData);
 		// Unmap file
 		UnmapViewOfFile(sharedData);
 	}
 
 }
 
-void SharedMemoryProcessor::process(bool shouldLog) {
+void SharedMemoryRenderer::process() {
 	// Open the memory mapped file
 	HANDLE fileHandle = OpenFileMappingA(PAGE_READONLY, FALSE, MAP_OBJECT_NAME);
 
 	if (fileHandle == NULL) {
 		// File is not available
-		logMessage(shouldLog, "ERROR: No data available to process, is Project CARS running and Shared Memory enabled?\n");
+		logMessage("ERROR: No data available to process, is Project CARS running and Shared Memory enabled?\n");
 	}else {
 		// File is available, process the file
-		processFile(fileHandle, shouldLog);
-		// Close the file
+		processFile(fileHandle);
+		// Close the file when done
 		CloseHandle(fileHandle);
 	}
 }

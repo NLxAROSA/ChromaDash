@@ -16,10 +16,12 @@ limitations under the License.
 
 */
 #pragma once
-class SharedMemoryProcessor	{
+class SharedMemoryRenderer	{
 public:
-	SharedMemoryProcessor();
-	~SharedMemoryProcessor();
-	void process(bool shouldPrint);
+	SharedMemoryRenderer();
+	~SharedMemoryRenderer();
+	void process();
+	void enableLogging();
+	void disableLogging();
 };
 
