@@ -96,8 +96,7 @@ BOOL ChromaKeyboardRenderer::Initialize()	{
 
 BOOL ChromaKeyboardRenderer::UnInitialize()	{
 
-	if (m_ChromaSDKModule != NULL)
-	{
+	if (m_ChromaSDKModule != NULL)	{
 		RZRESULT Result = RZRESULT_INVALID;
 		UNINIT UnInit = (UNINIT)GetProcAddress(m_ChromaSDKModule, "UnInit");
 		if (UnInit)	{
