@@ -2,7 +2,15 @@
 
 # Introducing ChromaDash for Project CARS #
 
-This project connects Project CARS to your Razer Chroma keyboard to show various information. It's a windows native command line application (written in C++ and a bit of plain old C) that will connect to Project CARS via Shared Memory and to your Razer Chroma keyboard via the Chroma SDK. At the moment this is limited to using the F-key row as an RPM meter and the numerical row for showing gears. Expect much more in the future!
+This project connects Project CARS to your Razer Chroma keyboard to show various information. It's a windows native command line application (written in C++ and a bit of plain old C) that will connect to Project CARS via Shared Memory and to your Razer Chroma keyboard via the Chroma SDK. The following information is displayed on the keyboard:
+
+- RPMs -> function key row
+- Tyre wear -> Q,W,A,S
+- Suspension damage -> R,T,F,G
+- Brake damage -> U,I,J,K
+- Aero damage -> HOME
+- Engine damage -> INSERT
+- Engine warning -> PAGE UP
 
 * See https://www.youtube.com/watch?v=AReeik9pvEc for an example video.
 
