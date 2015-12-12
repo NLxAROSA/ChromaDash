@@ -20,7 +20,7 @@ class SharedMemoryRenderer	{
 public:
 	SharedMemoryRenderer();
 	~SharedMemoryRenderer();
-	void process();
+	void render();
 	void enableLogging();
 	void disableLogging();
 };

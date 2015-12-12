@@ -53,8 +53,21 @@ void processSharedMemoryData(const SharedMemory* sharedData) {
 		// Version conflict, log an error
 		logMessage("ERROR: Data version mismatch, please make sure that your pCARS version matches your ChromaDash version\n");
 	}else {
-		// Got valid data, display this on the Chroma keyboard
-		chromaKeyboard.display(sharedData->mRpm, sharedData->mMaxRPM, sharedData->mGear);
+		// Got valid data, display this on the Chroma keyboard,
+		// after normalizing
+		float rpm = sharedData->mRpm;
+		float maxRpm = sharedData->mMaxRPM;
+
+		rpm = rpm > maxRpm ? maxRpm : rpm;
+
+		float tyreWear[4];
+
+		for (int i = 0; i < 4;i++)	{
+			tyreWear[i] = sharedData->mTyreWear[i] * 2.0f;
+			tyreWear[i] = tyreWear[i] > 1.0f ? 1.0f : tyreWear[i];
+		}
+
+		chromaKeyboard.display(rpm, maxRpm, sharedData->mGear, tyreWear);
 	}
 }
 
@@ -75,7 +88,7 @@ void processFile(HANDLE fileHandle) {
 
 }
 
-void SharedMemoryRenderer::process() {
+void SharedMemoryRenderer::render() {
 	// Open the memory mapped file
 	HANDLE fileHandle = OpenFileMappingA(PAGE_READONLY, FALSE, MAP_OBJECT_NAME);
 

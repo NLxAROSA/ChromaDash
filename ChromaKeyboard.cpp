@@ -113,12 +113,7 @@ BOOL ChromaKeyboard::teardown()	{
 
 void renderRpm(float rpm, float maxRpm, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect)	{
 
-	// RPMs can go beyond limiter in case of engine failure, but meter shouldn't.
-	if (rpm > maxRpm)	{
-		rpm = maxRpm;
-	}
-
-	// Only light up keys if there are actually any RPMs
+	// Only light up keys if there are actually any RPMs to display
 	if (maxRpm > 0 && rpm > 0) {
 		// Function keys as RPM
 		UINT currentRpm = UINT(rpm / maxRpm * 12.0); // 12 function keys
@@ -132,7 +127,7 @@ void renderRpm(float rpm, float maxRpm, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE*
 }
 
 void renderGear(int gear, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect)	{
-	// Only display gears 1 through 9
+	// Only display gears 1 through 9 and neutral (0)
 	if (gear >= -1 && gear < 10) {
 
 		switch (gear) {
@@ -171,7 +166,42 @@ void renderGear(int gear, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect)	{
 
 }
 
-void ChromaKeyboard::display(float rpm, float maxRpm, int gear)	{
+void renderTyreWear(float tyreWear[4], ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect)	{
+
+	COLORREF frontLeft = RGB((tyreWear[0] * 255), ((1.0 - tyreWear[0]) * 255), 0);
+	COLORREF frontRight = RGB((tyreWear[1] * 255), ((1.0 - tyreWear[1]) * 255), 0);
+	COLORREF rearLeft = RGB((tyreWear[2] * 255), ((1.0 - tyreWear[2]) * 255), 0);
+	COLORREF rearRight = RGB((tyreWear[3] * 255), ((1.0 - tyreWear[3]) * 255), 0);
+
+	UINT frontLeftLitKeys = 1 + UINT((1.0 - tyreWear[0]) * 4.0);
+	UINT frontRightLitKeys = 1 + UINT((1.0 - tyreWear[1]) * 4.0);
+	UINT rearLeftLitKeys = 1 + UINT((1.0 - tyreWear[2]) * 4.0);
+	UINT rearRightLitKeys = 1 + UINT((1.0 - tyreWear[3]) * 4.0);
+
+	frontLeftLitKeys = frontLeftLitKeys > 4 ? 4 : frontLeftLitKeys;
+	frontRightLitKeys = frontRightLitKeys > 4 ? 4 : frontRightLitKeys;
+	rearLeftLitKeys = rearLeftLitKeys > 4 ? 4 : rearLeftLitKeys;
+	rearRightLitKeys = rearRightLitKeys > 4 ? 4 : rearRightLitKeys;
+
+	for (UINT i = 0; i < frontLeftLitKeys; i++) {
+		Effect->Color[2][2 + i] = frontLeft;
+	}
+
+	for (UINT i = 0; i < frontRightLitKeys; i++) {
+		Effect->Color[2][7 + i] = frontRight;
+	}
+
+	for (UINT i = 0; i < rearLeftLitKeys; i++) {
+		Effect->Color[3][2 + i] = rearLeft;
+	}
+
+	for (UINT i = 0; i < rearRightLitKeys; i++) {
+		Effect->Color[3][7 + i] = rearRight;
+	}
+
+}
+
+void ChromaKeyboard::display(float rpm, float maxRpm, int gear, float tyreWear[4])	{
 
 	if (CreateKeyboardEffect) {
 
@@ -180,8 +210,12 @@ void ChromaKeyboard::display(float rpm, float maxRpm, int gear)	{
 		// Initialize the array by setting to black.
 		ZeroMemory(&Effect, sizeof(ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE));
 
-		renderRpm(rpm, maxRpm, &Effect);
-		renderGear(gear, &Effect);
+		if (rpm > 0)	{
+			// Only render if engine is running
+			renderRpm(rpm, maxRpm, &Effect);
+			renderGear(gear, &Effect);
+			renderTyreWear(tyreWear, &Effect);
+		}
 
 		Result = CreateKeyboardEffect(ChromaSDK::Keyboard::CHROMA_CUSTOM, &Effect, NULL);
 

@@ -31,7 +31,9 @@ SharedMemoryRenderer sharedMemoryRenderer;
 void createSharedMemoryRenderer()	{
 	// Process shared memory and log any errors
 	sharedMemoryRenderer.enableLogging();
-	sharedMemoryRenderer.process();
+	sharedMemoryRenderer.render();
+	// No more logging after initial setup
+	sharedMemoryRenderer.disableLogging();
 }
 
 int main()	{
@@ -42,9 +44,8 @@ int main()	{
     
 	// Keep polling until ESC is hit
 	while (true)	{
-		// Process shared memory, but don't log any errors at ~59FPS ;)
-		sharedMemoryRenderer.disableLogging();
-		sharedMemoryRenderer.process();
+		// Process shared memory
+		sharedMemoryRenderer.render();
 
 		// Check on exit criteria
 		if (_kbhit() && _getch() == ESC_KEY)	{

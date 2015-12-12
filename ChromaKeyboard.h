@@ -44,5 +44,5 @@ public:
 	~ChromaKeyboard();
 	BOOL setup();
 	BOOL teardown();
-	void display(float rpm, float maxRpm, int gear);
+	void display(float rpm, float maxRpm, int gear, float tyreWear[4]);
 };
