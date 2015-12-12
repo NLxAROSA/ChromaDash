@@ -25,6 +25,8 @@ limitations under the License.
 #define CHROMASDKDLL        _T("RzChromaSDK.dll")
 #endif
 
+#define MAX_TYRES 4
+
 typedef RZRESULT(*INIT)(void);
 typedef RZRESULT(*UNINIT)(void);
 typedef RZRESULT(*CREATEEFFECT)(RZDEVICEID DeviceId, ChromaSDK::EFFECT_TYPE Effect, PRZPARAM pParam, RZEFFECTID *pEffectId);
@@ -111,22 +113,19 @@ BOOL ChromaKeyboard::teardown()	{
 	return FALSE;
 }
 
-void renderRpm(float rpm, float maxRpm, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect)	{
+// Displays the RPM as a meter on the function key row
+void displayRpm(float rpm, float maxRpm, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect)	{
 
-	// Only light up keys if there are actually any RPMs to display
-	if (maxRpm > 0 && rpm > 0) {
-		// Function keys as RPM
-		UINT currentRpm = UINT(rpm / maxRpm * 12.0); // 12 function keys
+	UINT currentRpm = UINT(rpm / maxRpm * 12.0);
 
-		for (UINT i = 0; i < currentRpm; i++)	{
-			// F1 key starts from row 0, column 3 to column column 15
-			Effect->Color[0][3 + i] = RGB(((i / 12.0) * 255), (100 - (i / 12.0) * 100), 0);
-		}
+	for (UINT i = 0; i < currentRpm; i++)	{
+		Effect->Color[0][3 + i] = RGB(((i / 12.0) * 255), (100 - (i / 12.0) * 100), 0);
 	}
 
 }
 
-void renderGear(int gear, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect)	{
+// Displays the selected gear on the numerical keypad
+void displayGear(int gear, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect)	{
 	// Only display gears 1 through 9 and neutral (0)
 	if (gear >= -1 && gear < 10) {
 
@@ -166,42 +165,74 @@ void renderGear(int gear, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect)	{
 
 }
 
-void renderTyreWear(float tyreWear[4], ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect)	{
+// Displays a tire wear bar for a single tire
+void displayTyre(ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect, int tyre, COLORREF tyreColor, UINT i)	{
+	int row = 0;
+	int column = 0;
 
-	COLORREF frontLeft = RGB((tyreWear[0] * 255), ((1.0 - tyreWear[0]) * 255), 0);
-	COLORREF frontRight = RGB((tyreWear[1] * 255), ((1.0 - tyreWear[1]) * 255), 0);
-	COLORREF rearLeft = RGB((tyreWear[2] * 255), ((1.0 - tyreWear[2]) * 255), 0);
-	COLORREF rearRight = RGB((tyreWear[3] * 255), ((1.0 - tyreWear[3]) * 255), 0);
+	switch (tyre)	{
+			
+	case 0:
+		row = 2;
+		column = 2;
+		break;
+	case 1:
+		row = 2;
+		column = 7;
+		break;
+	case 2:
+		row = 3;
+		column = 2;
+		break;
+	case 3:
+		row = 3;
+		column = 7;
+		break;
 
-	UINT frontLeftLitKeys = 1 + UINT((1.0 - tyreWear[0]) * 4.0);
-	UINT frontRightLitKeys = 1 + UINT((1.0 - tyreWear[1]) * 4.0);
-	UINT rearLeftLitKeys = 1 + UINT((1.0 - tyreWear[2]) * 4.0);
-	UINT rearRightLitKeys = 1 + UINT((1.0 - tyreWear[3]) * 4.0);
-
-	frontLeftLitKeys = frontLeftLitKeys > 4 ? 4 : frontLeftLitKeys;
-	frontRightLitKeys = frontRightLitKeys > 4 ? 4 : frontRightLitKeys;
-	rearLeftLitKeys = rearLeftLitKeys > 4 ? 4 : rearLeftLitKeys;
-	rearRightLitKeys = rearRightLitKeys > 4 ? 4 : rearRightLitKeys;
-
-	for (UINT i = 0; i < frontLeftLitKeys; i++) {
-		Effect->Color[2][2 + i] = frontLeft;
 	}
 
-	for (UINT i = 0; i < frontRightLitKeys; i++) {
-		Effect->Color[2][7 + i] = frontRight;
+	Effect->Color[row][column + i] = tyreColor;
+}
+
+// Displays tyre wear bar for a single tyre on the keyboard
+void displayTyre(float tyreWear, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect, int tyre)	{
+
+	COLORREF tyreColor = RGB((tyreWear * 255), ((1.0 - tyreWear) * 255), 0);
+
+	/*
+		4 keys lit = 75-100% thread left
+		3 keys lit = 50-75% thread left
+		2 keys lit = 25-50% thread left
+		1 key lit = 0-25% thread left
+		0 keys lit = thread is gone
+
+		Note that in Project CARS you can still drive on the carcass after wearing out the thread. 
+	*/
+
+	UINT numberOfLitKeys = 1 + UINT((1.0 - tyreWear) * 4.0);
+	numberOfLitKeys = numberOfLitKeys > 4 ? 4 : numberOfLitKeys;
+
+	if (tyreWear >= 1.0f)
+	{
+		numberOfLitKeys = 4;
 	}
 
-	for (UINT i = 0; i < rearLeftLitKeys; i++) {
-		Effect->Color[3][2 + i] = rearLeft;
+	for (UINT i = 0; i < numberOfLitKeys; i++) {
+		displayTyre(Effect, tyre, tyreColor, i);
 	}
+}
 
-	for (UINT i = 0; i < rearRightLitKeys; i++) {
-		Effect->Color[3][7 + i] = rearRight;
+// Displays tyre wear on the keyboard
+void displayTyreWear(float tyreWear[MAX_TYRES], ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect)	{
+
+	for (int i = 0; i < MAX_TYRES; i++)	{
+		displayTyre(tyreWear[i], Effect, i);
 	}
 
 }
 
-void ChromaKeyboard::display(float rpm, float maxRpm, int gear, float tyreWear[4])	{
+// Display the requested data on the Chroma keyboard
+void ChromaKeyboard::display(float rpm, float maxRpm, int gear, float tyreWear[MAX_TYRES])	{
 
 	if (CreateKeyboardEffect) {
 
@@ -211,10 +242,10 @@ void ChromaKeyboard::display(float rpm, float maxRpm, int gear, float tyreWear[4
 		ZeroMemory(&Effect, sizeof(ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE));
 
 		if (rpm > 0)	{
-			// Only render if engine is running
-			renderRpm(rpm, maxRpm, &Effect);
-			renderGear(gear, &Effect);
-			renderTyreWear(tyreWear, &Effect);
+			// Only display if engine is running, black out otherwise
+			displayRpm(rpm, maxRpm, &Effect);
+			displayGear(gear, &Effect);
+			displayTyreWear(tyreWear, &Effect);
 		}
 
 		Result = CreateKeyboardEffect(ChromaSDK::Keyboard::CHROMA_CUSTOM, &Effect, NULL);
