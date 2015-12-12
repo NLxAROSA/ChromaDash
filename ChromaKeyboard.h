@@ -38,11 +38,27 @@ const COLORREF GREY = RGB(125, 125, 125);
 #define HEADSET_DEVICES     4
 #define KEYPAD_DEVICES      5
 
+#define MAX_WHEELS 4
+
+typedef enum WHEEL_INFO_TYPE {
+	TYRE_WEAR = 0,
+	BRAKE_DAMAGE = 1,
+	SUSPENSION_DAMAGE = 2
+} WHEEL_INFO_TYPE;
+
 class ChromaKeyboard	{
 public:
 	ChromaKeyboard();
 	~ChromaKeyboard();
 	BOOL setup();
 	BOOL teardown();
-	void display(float rpm, float maxRpm, int gear, float tyreWear[4]);
+	void display(float rpm, 
+		float maxRpm, 
+		int gear, 
+		const float tyreWear[MAX_WHEELS], 
+		const float brakeDamage[MAX_WHEELS], 
+		const float suspensionDamage[MAX_WHEELS], 
+		const float aeroDamage, 
+		const float engineDamage,
+		bool engineWarning);
 };

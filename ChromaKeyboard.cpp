@@ -25,8 +25,6 @@ limitations under the License.
 #define CHROMASDKDLL        _T("RzChromaSDK.dll")
 #endif
 
-#define MAX_TYRES 4
-
 typedef RZRESULT(*INIT)(void);
 typedef RZRESULT(*UNINIT)(void);
 typedef RZRESULT(*CREATEEFFECT)(RZDEVICEID DeviceId, ChromaSDK::EFFECT_TYPE Effect, PRZPARAM pParam, RZEFFECTID *pEffectId);
@@ -165,74 +163,102 @@ void displayGear(int gear, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect)	{
 
 }
 
-// Displays a tire wear bar for a single tire
-void displayTyre(ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect, int tyre, COLORREF tyreColor, UINT i)	{
-	int row = 0;
-	int column = 0;
-
-	switch (tyre)	{
-			
+// Determines where to display brake damage info for each wheel
+ChromaSDK::Keyboard::RZKEY determineTyreKey(int wheel) {
+	switch (wheel) {
 	case 0:
-		row = 2;
-		column = 2;
-		break;
+		return ChromaSDK::Keyboard::RZKEY_Q;
 	case 1:
-		row = 2;
-		column = 7;
-		break;
+		return ChromaSDK::Keyboard::RZKEY_W;
 	case 2:
-		row = 3;
-		column = 2;
-		break;
+		return ChromaSDK::Keyboard::RZKEY_A;
 	case 3:
-		row = 3;
-		column = 7;
-		break;
-
+		return ChromaSDK::Keyboard::RZKEY_S;
 	}
-
-	Effect->Color[row][column + i] = tyreColor;
+	return ChromaSDK::Keyboard::RZKEY_SPACE; // Just in case there are more than 4 tyres ;)
 }
 
-// Displays tyre wear bar for a single tyre on the keyboard
-void displayTyre(float tyreWear, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect, int tyre)	{
-
-	COLORREF tyreColor = RGB((tyreWear * 255), ((1.0 - tyreWear) * 255), 0);
-
-	/*
-		4 keys lit = 75-100% thread left
-		3 keys lit = 50-75% thread left
-		2 keys lit = 25-50% thread left
-		1 key lit = 0-25% thread left
-		0 keys lit = thread is gone
-
-		Note that in Project CARS you can still drive on the carcass after wearing out the thread. 
-	*/
-
-	UINT numberOfLitKeys = 1 + UINT((1.0 - tyreWear) * 4.0);
-	numberOfLitKeys = numberOfLitKeys > 4 ? 4 : numberOfLitKeys;
-
-	if (tyreWear >= 1.0f)
-	{
-		numberOfLitKeys = 4;
-	}
-
-	for (UINT i = 0; i < numberOfLitKeys; i++) {
-		displayTyre(Effect, tyre, tyreColor, i);
+// Determines where to display suspension damage info for each wheel
+ChromaSDK::Keyboard::RZKEY determineSuspensionDamageKey(int wheel) {
+	switch (wheel) {
+	case 0:
+		return ChromaSDK::Keyboard::RZKEY_R;
+	case 1:
+		return ChromaSDK::Keyboard::RZKEY_T;
+	case 2:
+		return ChromaSDK::Keyboard::RZKEY_F;
+	case 3:
+		return ChromaSDK::Keyboard::RZKEY_G;
+	default: return ChromaSDK::Keyboard::RZKEY_SPACE; // Just in case there are more than 4 tyres ;)
 	}
 }
 
-// Displays tyre wear on the keyboard
-void displayTyreWear(float tyreWear[MAX_TYRES], ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect)	{
-
-	for (int i = 0; i < MAX_TYRES; i++)	{
-		displayTyre(tyreWear[i], Effect, i);
+// Determines where to display tyre wear info for each wheel
+ChromaSDK::Keyboard::RZKEY determineBrakeDamageKey(int wheel) {
+	switch (wheel) {
+	case 0:
+		return ChromaSDK::Keyboard::RZKEY_U;
+	case 1:
+		return ChromaSDK::Keyboard::RZKEY_I;
+	case 2:
+		return ChromaSDK::Keyboard::RZKEY_J;
+	case 3:
+		return ChromaSDK::Keyboard::RZKEY_K;
 	}
+	return ChromaSDK::Keyboard::RZKEY_SPACE; // Just in case there are more than 4 tyres ;)
+}
 
+ChromaSDK::Keyboard::RZKEY determineWheelInfoKey(WHEEL_INFO_TYPE infoType, int wheel)	{
+	switch(infoType)	{
+		case TYRE_WEAR: return determineTyreKey(wheel);
+		case BRAKE_DAMAGE: return determineBrakeDamageKey(wheel);
+		case SUSPENSION_DAMAGE: return determineSuspensionDamageKey(wheel);
+		default: return determineSuspensionDamageKey(wheel);
+	}
+}
+
+// Displays a single tyre on the assigned key
+void displayWheel(WHEEL_INFO_TYPE infoType, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect, float wheelInfo, int wheel){
+	ChromaSDK::Keyboard::RZKEY key = determineWheelInfoKey(infoType, wheel);
+	COLORREF color = RGB((wheelInfo * 255), ((1.0 - wheelInfo) * 255), 0);
+	Effect->Color[HIBYTE(key)][LOBYTE(key)] = color;
+}
+
+// Displays wheel info per type
+void displayWheelInfo(WHEEL_INFO_TYPE infoType, const float wheelInfo[MAX_WHEELS], ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect)	{
+
+	for (int i = 0; i < MAX_WHEELS; i++) {
+		displayWheel(infoType, Effect, wheelInfo[i], i);
+	}
+}
+
+void displayAeroDamage(float aeroDamage, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect)	{
+	ChromaSDK::Keyboard::RZKEY key = ChromaSDK::Keyboard::RZKEY_HOME;
+	COLORREF color = RGB((aeroDamage * 255), ((1.0 - aeroDamage) * 255), 0);
+	Effect->Color[HIBYTE(key)][LOBYTE(key)] = color;
+}
+
+void displayEngineDamage(float engineDamage, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect) {
+	ChromaSDK::Keyboard::RZKEY key = ChromaSDK::Keyboard::RZKEY_INSERT;
+	COLORREF color = RGB((engineDamage * 255), ((1.0 - engineDamage) * 255), 0);
+	Effect->Color[HIBYTE(key)][LOBYTE(key)] = color;
+}
+
+void displayEngineWarning(ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE* Effect) {
+	ChromaSDK::Keyboard::RZKEY key = ChromaSDK::Keyboard::RZKEY_PAGEUP;
+	Effect->Color[HIBYTE(key)][LOBYTE(key)] = RED;
 }
 
 // Display the requested data on the Chroma keyboard
-void ChromaKeyboard::display(float rpm, float maxRpm, int gear, float tyreWear[MAX_TYRES])	{
+void ChromaKeyboard::display(float rpm, 
+	float maxRpm, 
+	int gear, 
+	const float tyreWear[MAX_WHEELS], 
+	const float brakeDamage[MAX_WHEELS], 
+	const float suspensionDamage[MAX_WHEELS], 
+	const float aeroDamage,
+	const float engineDamage,
+	bool engineWarning)	{
 
 	if (CreateKeyboardEffect) {
 
@@ -245,7 +271,15 @@ void ChromaKeyboard::display(float rpm, float maxRpm, int gear, float tyreWear[M
 			// Only display if engine is running, black out otherwise
 			displayRpm(rpm, maxRpm, &Effect);
 			displayGear(gear, &Effect);
-			displayTyreWear(tyreWear, &Effect);
+			displayWheelInfo(TYRE_WEAR, tyreWear, &Effect);
+			displayWheelInfo(BRAKE_DAMAGE, brakeDamage, &Effect);
+			displayWheelInfo(SUSPENSION_DAMAGE, suspensionDamage, &Effect);
+			displayEngineDamage(engineDamage, &Effect);
+			displayAeroDamage(aeroDamage, &Effect);
+
+			if (engineWarning)	{
+				displayEngineWarning(&Effect);
+			}
 		}
 
 		Result = CreateKeyboardEffect(ChromaSDK::Keyboard::CHROMA_CUSTOM, &Effect, NULL);

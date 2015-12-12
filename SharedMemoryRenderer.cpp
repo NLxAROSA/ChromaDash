@@ -67,7 +67,21 @@ void processSharedMemoryData(const SharedMemory* sharedData) {
 			tyreWear[i] = tyreWear[i] > 1.0f ? 1.0f : tyreWear[i];
 		}
 
-		chromaKeyboard.display(rpm, maxRpm, sharedData->mGear, tyreWear);
+		float brakeDamage[4];
+
+		for (int i = 0; i < 4; i++) {
+			brakeDamage[i] = sharedData->mBrakeDamage[i] * 2.0f;
+			brakeDamage[i] = brakeDamage[i] > 1.0f ? 1.0f : brakeDamage[i];
+		}
+
+		float suspensionDamage[4];
+
+		for (int i = 0; i < 4; i++) {
+			suspensionDamage[i] = sharedData->mSuspensionDamage[i] * 4.0f;
+			suspensionDamage[i] = suspensionDamage[i] > 1.0f ? 1.0f : suspensionDamage[i];
+		}
+
+		chromaKeyboard.display(rpm, maxRpm, sharedData->mGear, tyreWear, brakeDamage, suspensionDamage, sharedData->mAeroDamage, sharedData->mEngineDamage, sharedData->mCarFlags & CAR_ENGINE_WARNING);
 	}
 }
 
